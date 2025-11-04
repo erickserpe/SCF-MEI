@@ -3,266 +3,770 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Ello MEI - Gestão Financeira para Microempreendedores</title>
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.0/font/bootstrap-icons.css">
+    <meta name="description" content="ElloMEI - Gestão financeira inteligente e simplificada para Microempreendedores Individuais brasileiros">
+    <meta name="keywords" content="MEI, gestão financeira, microempreendedor, controle financeiro, Brasil">
+    <title>ElloMEI - Gestão Financeira Inteligente para MEI</title>
+    
+    <!-- Preconnect for performance -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link th:href="@{/css/landing.css}" rel="stylesheet">
+    
+    <!-- Google Fonts - Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Bootstrap Icons 1.11 -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    
     <style>
-        /* Smooth scrolling */
+        :root {
+            --primary-blue: #3B82F6;
+            --primary-blue-light: #60A5FA;
+            --primary-blue-dark: #2563EB;
+            --lavender: #E0E7FF;
+            --lavender-light: #F0F4FF;
+            --white: #FFFFFF;
+            --off-white: #FAFBFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--off-white);
+            color: var(--text-dark);
+            overflow-x: hidden;
+        }
+        
         html {
             scroll-behavior: smooth;
         }
         
-        /* Navigation active state */
-        .nav-link.active {
-            color: var(--primary-blue) !important;
-            font-weight: 600;
-        }
-        
-        /* Section spacing */
-        .section {
-            min-height: 100vh;
-            display: flex;
-            align-items: center;
-            position: relative;
-        }
-        
-        .section:not(#home) {
-            padding-top: 100px;
-        }
-        
-        /* About section styling */
-        #about {
-            background: linear-gradient(135deg, rgba(59, 130, 246, 0.05) 0%, rgba(224, 231, 255, 0.05) 100%);
-        }
-        
-        .about-content {
-            max-width: 800px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        
-        .about-title {
-            font-size: 3rem;
-            font-weight: 700;
-            color: #1E293B;
-            margin-bottom: 2rem;
-            line-height: 1.2;
-        }
-        
-        .about-text {
-            font-size: 1.25rem;
-            color: #64748B;
-            line-height: 1.8;
-            margin-bottom: 3rem;
-        }
-        
-        /* Contact section styling */
-        #contact {
-            background: var(--off-white);
-        }
-        
-        .contact-content {
-            max-width: 600px;
-            margin: 0 auto;
-            text-align: center;
-        }
-        
-        .contact-title {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #1E293B;
-            margin-bottom: 2rem;
-        }
-        
-        .contact-info {
-            background: var(--glass-bg);
+        /* Glassmorphism Effect */
+        .glass-card {
+            background: rgba(255, 255, 255, 0.25);
             backdrop-filter: blur(20px);
             -webkit-backdrop-filter: blur(20px);
-            border: 1px solid var(--glass-border);
-            border-radius: var(--border-radius);
-            box-shadow: var(--glass-shadow);
-            padding: 3rem;
-            margin-bottom: 2rem;
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border-radius: 24px;
+            transition: all 0.3s ease;
         }
         
-        .contact-email {
+        .glass-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px 0 rgba(31, 38, 135, 0.5);
+        }
+        
+        /* Navbar */
+        .navbar-glass {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 4px 16px 0 rgba(31, 38, 135, 0.15);
+        }
+        
+        .navbar-brand {
+            font-weight: 800;
             font-size: 1.5rem;
-            color: var(--primary-blue);
-            font-weight: 600;
-            text-decoration: none;
-            display: inline-flex;
+            color: var(--primary-blue) !important;
+            display: flex;
             align-items: center;
             gap: 0.5rem;
         }
         
-        .contact-email:hover {
-            color: #2563EB;
-            text-decoration: none;
+        .navbar-brand i {
+            font-size: 2rem;
         }
         
-        /* Hero section adjustments for single page */
-        .hero-content {
+        .nav-link {
+            color: var(--text-dark) !important;
+            font-weight: 500;
+            padding: 0.5rem 1rem !important;
+            transition: color 0.3s ease;
+        }
+        
+        .nav-link:hover,
+        .nav-link.active {
+            color: var(--primary-blue) !important;
+        }
+        
+        .btn-login {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 0.5rem 1.5rem;
+            border-radius: 12px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-login:hover {
+            background: var(--primary-blue-dark);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+        
+        /* Hero Section */
+        .hero-section {
+            min-height: 100vh;
             display: flex;
             align-items: center;
-            gap: 4rem;
+            position: relative;
+            overflow: hidden;
+            padding-top: 100px;
         }
         
-        .hero-text {
-            flex: 1;
+        /* Animated Background Gradients */
+        .gradient-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
         }
         
+        .gradient-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+        }
+        
+        .gradient-circle-1 {
+            width: 500px;
+            height: 500px;
+            background: var(--primary-blue);
+            top: -200px;
+            left: -200px;
+            animation-delay: 0s;
+        }
+        
+        .gradient-circle-2 {
+            width: 400px;
+            height: 400px;
+            background: var(--lavender);
+            bottom: -150px;
+            right: -150px;
+            animation-delay: 5s;
+        }
+        
+        .gradient-circle-3 {
+            width: 300px;
+            height: 300px;
+            background: var(--primary-blue-light);
+            top: 50%;
+            right: 10%;
+            animation-delay: 10s;
+        }
+        
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(5deg);
+            }
+        }
+        
+        .hero-title {
+            font-size: 4rem;
+            font-weight: 800;
+            line-height: 1.2;
+            margin-bottom: 1.5rem;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.5rem;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+            font-weight: 400;
+        }
+        
+        .hero-benefits {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+        
+        .hero-benefits li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            font-size: 1.1rem;
+            color: var(--text-dark);
+        }
+        
+        .hero-benefits i {
+            color: var(--primary-blue);
+            font-size: 1.5rem;
+        }
+        
+        .btn-primary-custom {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+            padding: 1rem 2.5rem;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+        
+        .btn-primary-custom:hover {
+            background: var(--primary-blue-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
+        }
+        
+        .btn-secondary-custom {
+            background: transparent;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+            padding: 1rem 2.5rem;
+            border-radius: 16px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .btn-secondary-custom:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px);
+        }
+        
+        /* 3D Piggy Bank Visual */
         .hero-visual {
-            flex: 1;
+            position: relative;
             display: flex;
             justify-content: center;
+            align-items: center;
         }
         
-        .login-card {
-            max-width: 400px;
-            margin-top: 2rem;
+        .piggy-container {
+            position: relative;
+            width: 400px;
+            height: 400px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
         }
         
-        @media (max-width: 992px) {
-            .hero-content {
-                flex-direction: column;
-                text-align: center;
+        .piggy-icon {
+            font-size: 15rem;
+            color: var(--primary-blue);
+            opacity: 0.2;
+            animation: piggyFloat 6s infinite ease-in-out;
+        }
+        
+        @keyframes piggyFloat {
+            0%, 100% {
+                transform: translateY(0px) scale(1);
             }
-            
-            .about-title {
+            50% {
+                transform: translateY(-30px) scale(1.05);
+            }
+        }
+        
+        .coin {
+            position: absolute;
+            font-size: 3rem;
+            color: var(--primary-blue-light);
+            animation: coinFloat 4s infinite ease-in-out;
+        }
+        
+        .coin-1 {
+            top: 10%;
+            left: 20%;
+            animation-delay: 0s;
+        }
+        
+        .coin-2 {
+            top: 20%;
+            right: 15%;
+            animation-delay: 1s;
+        }
+        
+        .coin-3 {
+            bottom: 25%;
+            left: 15%;
+            animation-delay: 2s;
+        }
+        
+        .coin-4 {
+            bottom: 15%;
+            right: 20%;
+            animation-delay: 3s;
+        }
+        
+        @keyframes coinFloat {
+            0%, 100% {
+                transform: translateY(0px) rotate(0deg);
+                opacity: 0.6;
+            }
+            50% {
+                transform: translateY(-40px) rotate(180deg);
+                opacity: 1;
+            }
+        }
+
+        /* Features Section */
+        .features-section {
+            padding: 100px 0;
+            background: linear-gradient(180deg, var(--off-white) 0%, rgba(224, 231, 255, 0.1) 100%);
+        }
+
+        .section-title {
+            font-size: 3rem;
+            font-weight: 800;
+            text-align: center;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .section-subtitle {
+            font-size: 1.2rem;
+            text-align: center;
+            color: var(--text-muted);
+            margin-bottom: 4rem;
+        }
+
+        .feature-card {
+            padding: 2.5rem;
+            height: 100%;
+            text-align: center;
+        }
+
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary-blue);
+            border-radius: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 1.5rem;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .feature-icon i {
+            font-size: 2.5rem;
+            color: white;
+        }
+
+        .feature-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .feature-description {
+            color: var(--text-muted);
+            line-height: 1.6;
+        }
+
+        /* Pricing Section */
+        .pricing-section {
+            padding: 100px 0;
+            background: var(--off-white);
+        }
+
+        .pricing-card {
+            padding: 3rem 2rem;
+            height: 100%;
+            position: relative;
+        }
+
+        .pricing-badge {
+            position: absolute;
+            top: -15px;
+            right: 20px;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            color: white;
+            padding: 0.5rem 1.5rem;
+            border-radius: 20px;
+            font-weight: 700;
+            font-size: 0.9rem;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.4);
+        }
+
+        .pricing-plan-name {
+            font-size: 1.8rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .pricing-price {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: var(--primary-blue);
+            margin-bottom: 0.5rem;
+        }
+
+        .pricing-period {
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features {
+            list-style: none;
+            margin-bottom: 2rem;
+        }
+
+        .pricing-features li {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .pricing-features i {
+            color: var(--primary-blue);
+            font-size: 1.2rem;
+        }
+
+        .btn-pricing {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+        }
+
+        .btn-pricing-primary {
+            background: var(--primary-blue);
+            color: white;
+            border: none;
+        }
+
+        .btn-pricing-primary:hover {
+            background: var(--primary-blue-dark);
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-pricing-secondary {
+            background: transparent;
+            color: var(--primary-blue);
+            border: 2px solid var(--primary-blue);
+        }
+
+        .btn-pricing-secondary:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-3px);
+        }
+
+        /* CTA Section */
+        .cta-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, var(--primary-blue) 0%, var(--primary-blue-dark) 100%);
+            color: white;
+            text-align: center;
+        }
+
+        .cta-title {
+            font-size: 3rem;
+            font-weight: 800;
+            margin-bottom: 1.5rem;
+        }
+
+        .cta-subtitle {
+            font-size: 1.3rem;
+            margin-bottom: 2.5rem;
+            opacity: 0.9;
+        }
+
+        .btn-cta {
+            background: white;
+            color: var(--primary-blue);
+            border: none;
+            padding: 1.2rem 3rem;
+            border-radius: 16px;
+            font-weight: 800;
+            font-size: 1.2rem;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.2);
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 12px 32px rgba(0, 0, 0, 0.3);
+        }
+
+        /* About Section */
+        .about-section {
+            padding: 100px 0;
+            background: linear-gradient(180deg, rgba(224, 231, 255, 0.1) 0%, var(--off-white) 100%);
+        }
+
+        .about-text {
+            font-size: 1.2rem;
+            line-height: 1.8;
+            color: var(--text-muted);
+            margin-bottom: 2rem;
+        }
+
+        .value-card {
+            padding: 2rem;
+            text-align: center;
+            height: 100%;
+        }
+
+        .value-icon {
+            font-size: 3rem;
+            color: var(--primary-blue);
+            margin-bottom: 1rem;
+        }
+
+        .value-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            color: var(--text-dark);
+        }
+
+        .value-description {
+            color: var(--text-muted);
+            font-size: 0.95rem;
+        }
+
+        /* Contact Section */
+        .contact-section {
+            padding: 100px 0;
+            background: var(--off-white);
+        }
+
+        .contact-card {
+            padding: 4rem 3rem;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+        }
+
+        .contact-icon {
+            font-size: 4rem;
+            color: var(--primary-blue);
+            margin-bottom: 1.5rem;
+        }
+
+        .contact-title {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-dark);
+        }
+
+        .contact-email {
+            font-size: 1.3rem;
+            color: var(--primary-blue);
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.3s ease;
+        }
+
+        .contact-email:hover {
+            color: var(--primary-blue-dark);
+            transform: scale(1.05);
+        }
+
+        /* Footer */
+        .footer {
+            background: linear-gradient(135deg, var(--text-dark) 0%, #0F172A 100%);
+            color: white;
+            padding: 3rem 0 2rem;
+            text-align: center;
+        }
+
+        .footer-logo {
+            font-size: 2rem;
+            font-weight: 800;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+        }
+
+        .footer-logo i {
+            font-size: 2.5rem;
+            color: var(--primary-blue-light);
+        }
+
+        .footer-tagline {
+            color: rgba(255, 255, 255, 0.7);
+            margin-bottom: 2rem;
+        }
+
+        .footer-copyright {
+            color: rgba(255, 255, 255, 0.5);
+            font-size: 0.9rem;
+            padding-top: 2rem;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .hero-title {
+                font-size: 3rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.2rem;
+            }
+
+            .section-title {
                 font-size: 2.5rem;
             }
-            
-            .contact-title {
+
+            .cta-title {
+                font-size: 2.5rem;
+            }
+        }
+
+        @media (max-width: 768px) {
+            .hero-title {
+                font-size: 2.5rem;
+            }
+
+            .hero-subtitle {
+                font-size: 1.1rem;
+            }
+
+            .section-title {
+                font-size: 2rem;
+            }
+
+            .cta-title {
+                font-size: 2rem;
+            }
+
+            .piggy-container {
+                width: 300px;
+                height: 300px;
+            }
+
+            .piggy-icon {
+                font-size: 10rem;
+            }
+
+            .coin {
                 font-size: 2rem;
             }
         }
     </style>
 </head>
 <body>
-    <!-- Fixed Navigation -->
-    <nav class="navbar navbar-expand-lg navbar-light fixed-top glass-nav">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-glass fixed-top">
         <div class="container">
-            <a class="navbar-brand fw-bold" href="#home">
-                <div class="brand-icon me-2">
-                    <i class="bi bi-piggy-bank"></i>
-                </div>
-                Ello MEI
+            <a class="navbar-brand" href="#home">
+                <i class="bi bi-piggy-bank"></i>
+                ElloMEI
             </a>
-            <button class="navbar-toggler border-0" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
-                <ul class="navbar-nav ms-auto">
+                <ul class="navbar-nav ms-auto align-items-center">
                     <li class="nav-item">
-                        <a class="nav-link smooth-scroll" href="#home">Início</a>
+                        <a class="nav-link active" href="#home">Início</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link smooth-scroll" href="#about">Sobre</a>
+                        <a class="nav-link" href="#features">Funcionalidades</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link smooth-scroll" href="#contact">Contato</a>
+                        <a class="nav-link" href="#pricing">Planos</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#about">Sobre</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contato</a>
+                    </li>
+                    <li class="nav-item ms-lg-3">
+                        <a th:href="@{/login}" class="btn btn-login">Entrar</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
 
-    <!-- Hero Section (Home) -->
-    <section id="home" class="section hero-section">
-        <div class="ambient-gradient gradient-1"></div>
-        <div class="ambient-gradient gradient-2"></div>
-        <div class="ambient-gradient gradient-3"></div>
-        
+    <!-- Hero Section -->
+    <section id="home" class="hero-section">
+        <div class="gradient-bg">
+            <div class="gradient-circle gradient-circle-1"></div>
+            <div class="gradient-circle gradient-circle-2"></div>
+            <div class="gradient-circle gradient-circle-3"></div>
+        </div>
+
         <div class="container">
-            <div class="hero-content">
-                <div class="hero-text">
-                    <h1 class="hero-title">
-                        A gestão financeira do seu MEI, simplificada e inteligente.
-                    </h1>
-                    <p class="hero-subtitle">
-                        Controle suas finanças, emita relatórios e mantenha seu negócio em dia, tudo num único lugar.
-                    </p>
-                    
-                    <div class="hero-features">
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="bi bi-graph-up-arrow"></i>
-                            </div>
-                            <span>Controle de receitas e despesas</span>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="bi bi-calendar-check"></i>
-                            </div>
-                            <span>Gestão de contas a pagar</span>
-                        </div>
-                        <div class="feature-item">
-                            <div class="feature-icon">
-                                <i class="bi bi-pie-chart"></i>
-                            </div>
-                            <span>Relatórios detalhados</span>
-                        </div>
-                    </div>
-                    
-                    <!-- Login Card -->
-                    <div class="glass-card login-card">
-                        <h4 class="fw-bold mb-3 text-center">Acesse sua conta</h4>
-                        <form th:action="@{/login}" method="post">
-                            <div class="mb-3">
-                                <label for="username" class="form-label">
-                                    <i class="bi bi-person me-2"></i>
-                                    Usuário
-                                </label>
-                                <input type="text" class="form-control glass-input" id="username" name="username" 
-                                       placeholder="Digite seu usuário" required>
-                            </div>
-                            
-                            <div class="mb-4">
-                                <label for="password" class="form-label">
-                                    <i class="bi bi-lock me-2"></i>
-                                    Senha
-                                </label>
-                                <input type="password" class="form-control glass-input" id="password" name="password" 
-                                       placeholder="Digite sua senha" required>
-                            </div>
-                            
-                            <button type="submit" class="btn btn-primary btn-lg w-100 glass-btn mb-3">
-                                <i class="bi bi-box-arrow-in-right me-2"></i>
-                                Entrar
-                            </button>
-                        </form>
-                        
-                        <div class="text-center">
-                            <p class="mb-0 text-muted">
-                                Não tem uma conta? 
-                                <a th:href="@{/registro}" class="text-primary fw-semibold text-decoration-none">
-                                    Cadastre-se aqui
-                                </a>
-                            </p>
-                        </div>
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <h1 class="hero-title">A gestão financeira do seu MEI, simplificada e inteligente.</h1>
+                    <p class="hero-subtitle">Controle completo das suas finanças em uma plataforma moderna, segura e fácil de usar.</p>
+
+                    <ul class="hero-benefits">
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Controle financeiro completo e intuitivo</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Relatórios profissionais em PDF</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>Gestão de múltiplas contas e contatos</span>
+                        </li>
+                        <li>
+                            <i class="bi bi-check-circle-fill"></i>
+                            <span>100% seguro e criptografado</span>
+                        </li>
+                    </ul>
+
+                    <div class="d-flex gap-3 flex-wrap">
+                        <a th:href="@{/registro}" class="btn btn-primary-custom">
+                            <i class="bi bi-rocket-takeoff me-2"></i>
+                            Começar Grátis
+                        </a>
+                        <a href="#features" class="btn btn-secondary-custom">
+                            <i class="bi bi-arrow-down-circle me-2"></i>
+                            Ver Funcionalidades
+                        </a>
                     </div>
                 </div>
-                
-                <div class="hero-visual">
-                    <div class="glass-piggy-bank">
-                        <div class="piggy-bank-icon">
-                            <i class="bi bi-piggy-bank"></i>
-                            <div class="currency-symbol">R$</div>
-                        </div>
-                        <div class="floating-elements">
-                            <div class="floating-coin coin-1">
-                                <i class="bi bi-coin"></i>
-                            </div>
-                            <div class="floating-coin coin-2">
-                                <i class="bi bi-currency-dollar"></i>
-                            </div>
-                            <div class="floating-coin coin-3">
-                                <i class="bi bi-graph-up"></i>
-                            </div>
+
+                <div class="col-lg-6">
+                    <div class="hero-visual">
+                        <div class="piggy-container">
+                            <i class="bi bi-piggy-bank piggy-icon"></i>
+                            <i class="bi bi-coin coin coin-1"></i>
+                            <i class="bi bi-coin coin coin-2"></i>
+                            <i class="bi bi-coin coin coin-3"></i>
+                            <i class="bi bi-coin coin coin-4"></i>
                         </div>
                     </div>
                 </div>
@@ -270,41 +774,262 @@
         </div>
     </section>
 
-    <!-- About Section -->
-    <section id="about" class="section">
+    <!-- Features Section -->
+    <section id="features" class="features-section">
         <div class="container">
-            <div class="about-content">
-                <h2 class="about-title">Feito para o MEI Brasileiro</h2>
-                <p class="about-text">
-                    O Ello MEI nasceu de uma necessidade simples: dar ao Microempreendedor Individual uma ferramenta financeira que realmente entende a sua realidade. Chega de planilhas complicadas e sistemas caros feitos para grandes empresas. Centralize as suas finanças, entenda a saúde do seu negócio com um dashboard intuitivo e tenha a tranquilidade de estar sempre em dia com as suas obrigações. O nosso foco é a sua autonomia.
-                </p>
-                
-                <div class="row g-4">
-                    <div class="col-md-4">
-                        <div class="glass-card text-center h-100">
-                            <div class="feature-icon mx-auto mb-3" style="width: 80px; height: 80px;">
-                                <i class="bi bi-shield-check"></i>
-                            </div>
-                            <h5 class="fw-bold mb-3">Segurança Total</h5>
-                            <p class="text-muted">Seus dados financeiros protegidos com criptografia de ponta.</p>
+            <h2 class="section-title">Tudo que você precisa para gerenciar seu MEI</h2>
+            <p class="section-subtitle">Funcionalidades pensadas para simplificar sua rotina financeira</p>
+
+            <div class="row g-4">
+                <!-- Feature 1 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-cash-stack"></i>
                         </div>
+                        <h3 class="feature-title">Controle Financeiro Completo</h3>
+                        <p class="feature-description">
+                            Registre todas as suas entradas e saídas com facilidade. Acompanhe seu fluxo de caixa em tempo real e tome decisões mais inteligentes.
+                        </p>
                     </div>
-                    <div class="col-md-4">
-                        <div class="glass-card text-center h-100">
-                            <div class="feature-icon mx-auto mb-3" style="width: 80px; height: 80px;">
-                                <i class="bi bi-lightning"></i>
-                            </div>
-                            <h5 class="fw-bold mb-3">Rápido e Eficiente</h5>
-                            <p class="text-muted">Interface otimizada para agilizar suas tarefas diárias.</p>
+                </div>
+
+                <!-- Feature 2 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-bank"></i>
                         </div>
+                        <h3 class="feature-title">Múltiplas Contas</h3>
+                        <p class="feature-description">
+                            Gerencie várias contas bancárias em um só lugar. Visualize o saldo consolidado e movimentações de todas as suas contas.
+                        </p>
                     </div>
-                    <div class="col-md-4">
-                        <div class="glass-card text-center h-100">
-                            <div class="feature-icon mx-auto mb-3" style="width: 80px; height: 80px;">
-                                <i class="bi bi-headset"></i>
+                </div>
+
+                <!-- Feature 3 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-people"></i>
+                        </div>
+                        <h3 class="feature-title">Gestão de Contatos</h3>
+                        <p class="feature-description">
+                            Organize seus clientes e fornecedores. Mantenha um cadastro completo com histórico de transações e informações de contato.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 4 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-file-earmark-text"></i>
+                        </div>
+                        <h3 class="feature-title">Comprovantes Digitais</h3>
+                        <p class="feature-description">
+                            Anexe e armazene comprovantes de pagamento e notas fiscais. Tudo organizado e acessível quando você precisar.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 5 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-graph-up"></i>
+                        </div>
+                        <h3 class="feature-title">Relatórios Inteligentes</h3>
+                        <p class="feature-description">
+                            Gere relatórios profissionais em PDF com gráficos e análises. Perfeito para apresentar ao seu contador ou para análise própria.
+                        </p>
+                    </div>
+                </div>
+
+                <!-- Feature 6 -->
+                <div class="col-md-6 col-lg-4">
+                    <div class="glass-card feature-card">
+                        <div class="feature-icon">
+                            <i class="bi bi-shield-check"></i>
+                        </div>
+                        <h3 class="feature-title">Segurança Total</h3>
+                        <p class="feature-description">
+                            Seus dados protegidos com criptografia de ponta. Backups automáticos e conformidade com a LGPD garantem sua tranquilidade.
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Pricing Section -->
+    <section id="pricing" class="pricing-section">
+        <div class="container">
+            <h2 class="section-title">Planos que cabem no seu bolso</h2>
+            <p class="section-subtitle">Escolha o plano ideal para o seu negócio</p>
+
+            <div class="row g-4 justify-content-center">
+                <!-- Plano FREE -->
+                <div class="col-md-6 col-lg-5">
+                    <div class="glass-card pricing-card">
+                        <h3 class="pricing-plan-name">FREE</h3>
+                        <div class="pricing-price">R$ 0</div>
+                        <div class="pricing-period">/mês</div>
+
+                        <ul class="pricing-features">
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Até 20 lançamentos por mês</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>1 conta bancária</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Até 10 contatos</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Relatórios básicos</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Dashboard financeiro</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span>Suporte por email</span>
+                            </li>
+                        </ul>
+
+                        <a th:href="@{/registro}" class="btn btn-pricing btn-pricing-secondary">
+                            Começar Grátis
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Plano PRO -->
+                <div class="col-md-6 col-lg-5">
+                    <div class="glass-card pricing-card">
+                        <div class="pricing-badge">
+                            <i class="bi bi-star-fill me-1"></i>
+                            Mais Popular
+                        </div>
+
+                        <h3 class="pricing-plan-name">PRO</h3>
+                        <div class="pricing-price">R$ 29,90</div>
+                        <div class="pricing-period">/mês</div>
+
+                        <ul class="pricing-features">
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span><strong>Lançamentos ilimitados</strong></span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span><strong>Contas ilimitadas</strong></span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span><strong>Contatos ilimitados</strong></span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span><strong>Relatórios avançados em PDF</strong></span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span><strong>Anexar comprovantes</strong></span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span><strong>Suporte prioritário</strong></span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span><strong>Backup automático</strong></span>
+                            </li>
+                            <li>
+                                <i class="bi bi-check-circle-fill"></i>
+                                <span><strong>7 dias grátis para testar</strong></span>
+                            </li>
+                        </ul>
+
+                        <a th:href="@{/registro}" class="btn btn-pricing btn-pricing-primary">
+                            Começar Teste Grátis
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- CTA Section -->
+    <section class="cta-section">
+        <div class="container">
+            <h2 class="cta-title">Pronto para simplificar suas finanças?</h2>
+            <p class="cta-subtitle">Junte-se a centenas de MEIs que já transformaram sua gestão financeira</p>
+            <a th:href="@{/registro}" class="btn btn-cta">
+                <i class="bi bi-rocket-takeoff me-2"></i>
+                Criar Conta Grátis Agora
+            </a>
+        </div>
+    </section>
+
+    <!-- About Section -->
+    <section id="about" class="about-section">
+        <div class="container">
+            <div class="row align-items-center">
+                <div class="col-lg-6 mb-5 mb-lg-0">
+                    <h2 class="section-title text-start">Sobre o ElloMEI</h2>
+                    <p class="about-text">
+                        O <strong>ElloMEI</strong> nasceu da necessidade de oferecer aos Microempreendedores Individuais brasileiros uma ferramenta de gestão financeira moderna, acessível e fácil de usar.
+                    </p>
+                    <p class="about-text">
+                        Nossa missão é <strong>simplificar a vida financeira dos MEIs</strong>, permitindo que você foque no que realmente importa: fazer seu negócio crescer.
+                    </p>
+                    <p class="about-text">
+                        Com tecnologia de ponta e design intuitivo, transformamos a complexidade da gestão financeira em uma experiência simples e agradável.
+                    </p>
+                </div>
+
+                <div class="col-lg-6">
+                    <div class="row g-4">
+                        <!-- Value 1 -->
+                        <div class="col-6">
+                            <div class="glass-card value-card">
+                                <i class="bi bi-lightning-charge value-icon"></i>
+                                <h4 class="value-title">Rápido</h4>
+                                <p class="value-description">Interface ágil e responsiva</p>
                             </div>
-                            <h5 class="fw-bold mb-3">Suporte Dedicado</h5>
-                            <p class="text-muted">Equipe especializada pronta para ajudar você a crescer.</p>
+                        </div>
+
+                        <!-- Value 2 -->
+                        <div class="col-6">
+                            <div class="glass-card value-card">
+                                <i class="bi bi-shield-lock value-icon"></i>
+                                <h4 class="value-title">Seguro</h4>
+                                <p class="value-description">Dados protegidos e criptografados</p>
+                            </div>
+                        </div>
+
+                        <!-- Value 3 -->
+                        <div class="col-6">
+                            <div class="glass-card value-card">
+                                <i class="bi bi-heart value-icon"></i>
+                                <h4 class="value-title">Intuitivo</h4>
+                                <p class="value-description">Fácil de usar desde o primeiro dia</p>
+                            </div>
+                        </div>
+
+                        <!-- Value 4 -->
+                        <div class="col-6">
+                            <div class="glass-card value-card">
+                                <i class="bi bi-headset value-icon"></i>
+                                <h4 class="value-title">Suporte</h4>
+                                <p class="value-description">Equipe pronta para ajudar</p>
+                            </div>
                         </div>
                     </div>
                 </div>
@@ -313,56 +1038,48 @@
     </section>
 
     <!-- Contact Section -->
-    <section id="contact" class="section">
+    <section id="contact" class="contact-section">
         <div class="container">
-            <div class="contact-content">
-                <h2 class="contact-title">Fale Conosco</h2>
-
-                <div class="contact-info">
-                    <div class="mb-4">
-                        <i class="bi bi-envelope-fill text-primary" style="font-size: 3rem;"></i>
-                    </div>
-                    <p class="text-muted mb-3">
-                        Tem alguma dúvida, sugestão ou precisa de ajuda? A sua opinião é fundamental para nós. Envie um e-mail para contato@ellomei.com.br e a nossa equipa responderá o mais breve possível.
-                    </p>
-                    <a href="mailto:contato@ellomei.com.br" class="contact-email">
-                        <i class="bi bi-envelope"></i>
-                        contato@ellomei.com.br
-                    </a>
-                </div>
+            <div class="glass-card contact-card">
+                <i class="bi bi-envelope contact-icon"></i>
+                <h2 class="contact-title">Entre em Contato</h2>
+                <p class="mb-4" style="color: var(--text-muted);">
+                    Tem alguma dúvida ou sugestão? Estamos aqui para ajudar!
+                </p>
+                <a href="mailto:noreply@ellomei.com" class="contact-email">
+                    <i class="bi bi-envelope-fill me-2"></i>
+                    noreply@ellomei.com
+                </a>
             </div>
         </div>
     </section>
 
     <!-- Footer -->
-    <footer class="glass-footer py-4">
+    <footer class="footer">
         <div class="container">
-            <div class="row align-items-center">
-                <div class="col-md-6">
-                    <div class="d-flex align-items-center">
-                        <div class="brand-icon me-2">
-                            <i class="bi bi-piggy-bank"></i>
-                        </div>
-                        <span class="fw-bold">Ello MEI</span>
-                    </div>
-                </div>
-                <div class="col-md-6 text-md-end">
-                    <p class="mb-0 text-muted">© 2024 Ello MEI. Todos os direitos reservados.</p>
-                </div>
+            <div class="footer-logo">
+                <i class="bi bi-piggy-bank"></i>
+                <span>ElloMEI</span>
+            </div>
+            <p class="footer-tagline">Gestão financeira inteligente para MEI</p>
+            <div class="footer-copyright">
+                © 2025 ElloMEI. Todos os direitos reservados.
             </div>
         </div>
     </footer>
 
+    <!-- Bootstrap JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
+
+    <!-- Custom JavaScript -->
     <script>
-        // Smooth scrolling for navigation links
+        // Smooth scrolling for anchor links
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
                 const target = document.querySelector(this.getAttribute('href'));
                 if (target) {
-                    const offsetTop = target.offsetTop - 80; // Account for fixed navbar
+                    const offsetTop = target.offsetTop - 80;
                     window.scrollTo({
                         top: offsetTop,
                         behavior: 'smooth'
@@ -371,15 +1088,17 @@
             });
         });
 
-        // Update active navigation link on scroll
-        window.addEventListener('scroll', function() {
-            const sections = document.querySelectorAll('.section');
+        // Active navigation highlighting on scroll
+        window.addEventListener('scroll', () => {
+            const sections = document.querySelectorAll('section[id]');
             const navLinks = document.querySelectorAll('.nav-link');
-            
+
             let current = '';
+
             sections.forEach(section => {
                 const sectionTop = section.offsetTop - 100;
                 const sectionHeight = section.clientHeight;
+
                 if (window.pageYOffset >= sectionTop && window.pageYOffset < sectionTop + sectionHeight) {
                     current = section.getAttribute('id');
                 }
@@ -387,7 +1106,7 @@
 
             navLinks.forEach(link => {
                 link.classList.remove('active');
-                if (link.getAttribute('href') === '#' + current) {
+                if (link.getAttribute('href') === `#${current}`) {
                     link.classList.add('active');
                 }
             });
@@ -395,3 +1114,4 @@
     </script>
 </body>
 </html>
+

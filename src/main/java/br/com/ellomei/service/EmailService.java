@@ -20,6 +20,7 @@ import java.time.format.DateTimeFormatter;
  * Integrado com Google Workspace (Gmail Corporativo) via SMTP.
  *
  * Responsabilidades:
+ * - Enviar e-mail de verificação de email (código de 6 dígitos)
  * - Enviar e-mail de boas-vindas
  * - Enviar e-mail de upgrade de plano
  * - Enviar e-mail de cancelamento
@@ -49,7 +50,44 @@ public class EmailService {
     private String baseUrl;
 
     private static final DateTimeFormatter DATE_FORMATTER = DateTimeFormatter.ofPattern("dd/MM/yyyy");
-    
+
+    /**
+     * Envia e-mail com código de verificação de 6 dígitos.
+     */
+    public void enviarEmailVerificacao(String destinatario, String nomeUsuario, String codigo) {
+        if (mailSender == null) {
+            logger.warn("JavaMailSender não configurado. Email de verificação não será enviado.");
+            logger.info("========================================");
+            logger.info("📧 E-MAIL DE VERIFICAÇÃO (MOCK)");
+            logger.info("========================================");
+            logger.info("Para: {}", destinatario);
+            logger.info("Nome: {}", nomeUsuario);
+            logger.info("Código: {}", codigo);
+            logger.info("========================================");
+            return;
+        }
+
+        try {
+            String assunto = "🔐 Código de Verificação - ElloMEI";
+            String corpo = construirEmailVerificacao(nomeUsuario, codigo);
+
+            enviarEmailHtml(destinatario, assunto, corpo);
+
+            logger.info("✅ Email de verificação enviado para: {}", destinatario);
+
+        } catch (Exception e) {
+            logger.error("❌ Erro ao enviar email de verificação para {}: {}", destinatario, e.getMessage());
+            logger.warn("========================================");
+            logger.warn("📧 E-MAIL DE VERIFICAÇÃO (FALLBACK)");
+            logger.warn("========================================");
+            logger.warn("Para: {}", destinatario);
+            logger.warn("Nome: {}", nomeUsuario);
+            logger.warn("Código: {}", codigo);
+            logger.warn("========================================");
+            // NÃO lança exceção para não bloquear o registro
+        }
+    }
+
     /**
      * Envia e-mail de boas-vindas para novo usuário.
      */
@@ -363,6 +401,169 @@ public class EmailService {
     }
 
     /**
+     * Constrói o HTML do email de verificação com código de 6 dígitos.
+     */
+    private String construirEmailVerificacao(String nomeUsuario, String codigo) {
+        return """
+            <!DOCTYPE html>
+            <html lang="pt-BR">
+            <head>
+                <meta charset="UTF-8">
+                <meta name="viewport" content="width=device-width, initial-scale=1.0">
+                <style>
+                    * {
+                        margin: 0;
+                        padding: 0;
+                        box-sizing: border-box;
+                    }
+                    body {
+                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        background: linear-gradient(135deg, #FAFBFF 0%%, #E0E7FF 100%%);
+                        margin: 0;
+                        padding: 40px 20px;
+                    }
+                    .container {
+                        max-width: 600px;
+                        margin: 0 auto;
+                        background: rgba(255, 255, 255, 0.95);
+                        backdrop-filter: blur(20px);
+                        border-radius: 24px;
+                        overflow: hidden;
+                        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+                        border: 1px solid rgba(255, 255, 255, 0.18);
+                    }
+                    .header {
+                        background: linear-gradient(135deg, #3B82F6 0%%, #2563EB 100%%);
+                        color: white;
+                        padding: 48px 40px;
+                        text-align: center;
+                    }
+                    .header-icon {
+                        width: 80px;
+                        height: 80px;
+                        background: rgba(255, 255, 255, 0.2);
+                        border-radius: 50%%;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-bottom: 20px;
+                        font-size: 40px;
+                    }
+                    .header h1 {
+                        margin: 0;
+                        font-size: 32px;
+                        font-weight: 800;
+                        letter-spacing: -0.5px;
+                    }
+                    .content {
+                        padding: 48px 40px;
+                        color: #1E293B;
+                        line-height: 1.8;
+                    }
+                    .content h2 {
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #1E293B;
+                        margin-bottom: 16px;
+                    }
+                    .content p {
+                        font-size: 16px;
+                        color: #64748B;
+                        margin-bottom: 16px;
+                    }
+                    .codigo-box {
+                        background: linear-gradient(135deg, #3B82F6 0%%, #2563EB 100%%);
+                        color: white;
+                        font-size: 56px;
+                        font-weight: 800;
+                        letter-spacing: 12px;
+                        text-align: center;
+                        padding: 40px;
+                        border-radius: 20px;
+                        margin: 32px 0;
+                        font-family: 'Courier New', monospace;
+                        box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+                    }
+                    .info-box {
+                        background: rgba(59, 130, 246, 0.05);
+                        border-left: 4px solid #3B82F6;
+                        padding: 20px;
+                        margin: 24px 0;
+                        border-radius: 12px;
+                        font-size: 15px;
+                        color: #1E293B;
+                    }
+                    .info-box strong {
+                        color: #3B82F6;
+                        font-weight: 700;
+                    }
+                    .warning {
+                        background: rgba(251, 191, 36, 0.1);
+                        border-left: 4px solid #F59E0B;
+                        padding: 20px;
+                        margin: 24px 0;
+                        border-radius: 12px;
+                        font-size: 15px;
+                        color: #92400E;
+                    }
+                    .warning strong {
+                        color: #B45309;
+                        font-weight: 700;
+                    }
+                    .footer {
+                        background: rgba(248, 250, 252, 0.8);
+                        padding: 32px 40px;
+                        text-align: center;
+                        color: #64748B;
+                        font-size: 14px;
+                        border-top: 1px solid rgba(59, 130, 246, 0.1);
+                    }
+                    .footer p {
+                        margin: 8px 0;
+                    }
+                    .brand {
+                        color: #3B82F6;
+                        font-weight: 700;
+                    }
+                </style>
+            </head>
+            <body>
+                <div class="container">
+                    <div class="header">
+                        <div class="header-icon">🔐</div>
+                        <h1>Verificação de Email</h1>
+                    </div>
+                    <div class="content">
+                        <h2>Olá, %s!</h2>
+                        <p>Obrigado por se cadastrar no <span class="brand">ElloMEI</span>!</p>
+                        <p>Para confirmar seu email e ativar sua conta, utilize o código de verificação abaixo:</p>
+
+                        <div class="codigo-box">
+                            %s
+                        </div>
+
+                        <div class="info-box">
+                            💡 <strong>Como usar:</strong> Digite este código na página de verificação para confirmar seu email e começar a usar o ElloMEI.
+                        </div>
+
+                        <div class="warning">
+                            ⏰ <strong>Atenção:</strong> Este código expira em <strong>15 minutos</strong>.
+                        </div>
+
+                        <p style="color: #94A3B8; font-size: 14px;">Se você não solicitou este cadastro, ignore este email.</p>
+                    </div>
+                    <div class="footer">
+                        <p><strong class="brand">ElloMEI</strong> - Gestão Financeira Inteligente para MEI</p>
+                        <p>© 2024 ElloMEI. Todos os direitos reservados.</p>
+                        <p style="margin-top: 16px; font-size: 13px;">Este é um email automático, por favor não responda.</p>
+                    </div>
+                </div>
+            </body>
+            </html>
+            """.formatted(nomeUsuario, codigo);
+    }
+
+    /**
      * Constrói o HTML do email de recuperação de senha.
      */
     private String construirEmailRecuperacaoSenha(String nomeUsuario, String linkRecuperacao) {
@@ -537,108 +738,192 @@ public class EmailService {
                 <meta charset="UTF-8">
                 <meta name="viewport" content="width=device-width, initial-scale=1.0">
                 <style>
-                    body {
-                        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-                        background-color: #f4f4f4;
+                    * {
                         margin: 0;
                         padding: 0;
+                        box-sizing: border-box;
+                    }
+                    body {
+                        font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+                        background: linear-gradient(135deg, #FAFBFF 0%%, #E0E7FF 100%%);
+                        margin: 0;
+                        padding: 40px 20px;
                     }
                     .container {
                         max-width: 600px;
-                        margin: 40px auto;
-                        background-color: #ffffff;
-                        border-radius: 10px;
+                        margin: 0 auto;
+                        background: rgba(255, 255, 255, 0.95);
+                        backdrop-filter: blur(20px);
+                        border-radius: 24px;
                         overflow: hidden;
-                        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+                        box-shadow: 0 8px 32px rgba(31, 38, 135, 0.15);
+                        border: 1px solid rgba(255, 255, 255, 0.18);
                     }
                     .header {
-                        background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%);
+                        background: linear-gradient(135deg, #3B82F6 0%%, #2563EB 100%%);
                         color: white;
-                        padding: 30px;
+                        padding: 48px 40px;
                         text-align: center;
+                    }
+                    .header-icon {
+                        width: 80px;
+                        height: 80px;
+                        background: rgba(255, 255, 255, 0.2);
+                        border-radius: 50%%;
+                        display: inline-flex;
+                        align-items: center;
+                        justify-content: center;
+                        margin-bottom: 20px;
+                        font-size: 40px;
                     }
                     .header h1 {
                         margin: 0;
-                        font-size: 28px;
+                        font-size: 32px;
+                        font-weight: 800;
+                        letter-spacing: -0.5px;
                     }
                     .content {
-                        padding: 40px 30px;
-                        color: #333;
-                        line-height: 1.6;
+                        padding: 48px 40px;
+                        color: #1E293B;
+                        line-height: 1.8;
                     }
                     .content h2 {
-                        color: #667eea;
-                        margin-top: 0;
+                        font-size: 24px;
+                        font-weight: 700;
+                        color: #1E293B;
+                        margin-bottom: 16px;
+                    }
+                    .content p {
+                        font-size: 16px;
+                        color: #64748B;
+                        margin-bottom: 16px;
                     }
                     .button {
                         display: inline-block;
-                        padding: 12px 30px;
-                        background: linear-gradient(135deg, #667eea 0%%, #764ba2 100%%);
+                        padding: 16px 40px;
+                        background: linear-gradient(135deg, #3B82F6 0%%, #2563EB 100%%);
                         color: white;
                         text-decoration: none;
-                        border-radius: 5px;
-                        font-weight: bold;
-                        margin: 20px 0;
+                        border-radius: 16px;
+                        font-weight: 700;
+                        margin: 24px 0;
+                        box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+                        letter-spacing: 0.3px;
                     }
                     .features {
-                        background-color: #f8f9fa;
-                        padding: 20px;
-                        border-radius: 5px;
-                        margin: 20px 0;
+                        background: rgba(59, 130, 246, 0.05);
+                        padding: 24px;
+                        border-radius: 16px;
+                        margin: 24px 0;
+                        border-left: 4px solid #3B82F6;
+                    }
+                    .features h3 {
+                        color: #1E293B;
+                        font-size: 18px;
+                        font-weight: 700;
+                        margin-bottom: 16px;
                     }
                     .features ul {
-                        margin: 10px 0;
-                        padding-left: 20px;
+                        margin: 12px 0;
+                        padding-left: 24px;
+                        list-style: none;
                     }
                     .features li {
-                        margin: 8px 0;
+                        margin: 12px 0;
+                        color: #64748B;
+                        font-size: 15px;
+                        position: relative;
+                        padding-left: 8px;
+                    }
+                    .features li:before {
+                        content: "✓";
+                        position: absolute;
+                        left: -20px;
+                        color: #3B82F6;
+                        font-weight: bold;
+                    }
+                    .upgrade-box {
+                        background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%%, rgba(37, 99, 235, 0.1) 100%%);
+                        padding: 24px;
+                        border-radius: 16px;
+                        margin: 24px 0;
+                        border: 2px solid rgba(59, 130, 246, 0.2);
+                    }
+                    .upgrade-box h3 {
+                        color: #3B82F6;
+                        font-size: 18px;
+                        font-weight: 700;
+                        margin-bottom: 16px;
+                    }
+                    .upgrade-box ul {
+                        margin: 12px 0;
+                        padding-left: 24px;
+                        list-style: none;
+                    }
+                    .upgrade-box li {
+                        margin: 12px 0;
+                        color: #1E293B;
+                        font-size: 15px;
+                        font-weight: 600;
                     }
                     .footer {
-                        background-color: #f8f9fa;
-                        padding: 20px;
+                        background: rgba(248, 250, 252, 0.8);
+                        padding: 32px 40px;
                         text-align: center;
-                        color: #666;
+                        color: #64748B;
                         font-size: 14px;
+                        border-top: 1px solid rgba(59, 130, 246, 0.1);
+                    }
+                    .footer p {
+                        margin: 8px 0;
+                    }
+                    .brand {
+                        color: #3B82F6;
+                        font-weight: 700;
                     }
                 </style>
             </head>
             <body>
                 <div class="container">
                     <div class="header">
-                        <h1>🎉 Bem-vindo ao ElloMEI!</h1>
+                        <div class="header-icon">🎉</div>
+                        <h1>Bem-vindo ao ElloMEI!</h1>
                     </div>
                     <div class="content">
                         <h2>Olá, %s!</h2>
-                        <p>Seja bem-vindo ao <strong>ElloMEI - Sistema de Controle Financeiro para MEI</strong>!</p>
+                        <p>Seja bem-vindo ao <span class="brand">ElloMEI</span> - Gestão Financeira Inteligente para MEI!</p>
                         <p>Estamos muito felizes em tê-lo conosco. Sua conta foi criada com sucesso e você já pode começar a usar todos os recursos.</p>
 
                         <div class="features">
                             <h3>🎁 Seu Plano FREE inclui:</h3>
                             <ul>
-                                <li>✅ Até 20 lançamentos por mês</li>
-                                <li>✅ Gestão completa de contas e contatos</li>
-                                <li>✅ Relatórios básicos</li>
-                                <li>✅ Categorização de despesas</li>
+                                <li>Até 20 lançamentos por mês</li>
+                                <li>Gestão completa de contas e contatos</li>
+                                <li>Relatórios básicos</li>
+                                <li>Categorização de despesas</li>
                             </ul>
                         </div>
 
-                        <p>Quer mais recursos? Faça upgrade para o <strong>Plano PRO</strong> e tenha:</p>
-                        <ul>
-                            <li>🚀 Lançamentos ILIMITADOS</li>
-                            <li>📊 Relatórios avançados</li>
-                            <li>📈 Gráficos e análises</li>
-                            <li>⭐ Suporte prioritário</li>
-                        </ul>
-
-                        <div style="text-align: center;">
-                            <a href="%s/dashboard" class="button">Começar Agora</a>
+                        <div class="upgrade-box">
+                            <h3>🚀 Quer mais recursos? Faça upgrade para o Plano PRO!</h3>
+                            <ul>
+                                <li>📊 Lançamentos ILIMITADOS</li>
+                                <li>📈 Relatórios avançados e gráficos</li>
+                                <li>💡 Análises inteligentes</li>
+                                <li>⭐ Suporte prioritário</li>
+                            </ul>
                         </div>
 
-                        <p>Se tiver alguma dúvida, estamos aqui para ajudar!</p>
+                        <div style="text-align: center;">
+                            <a href="%s/dashboard" class="button">Começar Agora →</a>
+                        </div>
+
+                        <p style="text-align: center; margin-top: 32px; color: #94A3B8; font-size: 14px;">Se tiver alguma dúvida, estamos aqui para ajudar!</p>
                     </div>
                     <div class="footer">
-                        <p>© 2024 ElloMEI - Sistema de Controle Financeiro para MEI</p>
-                        <p>Este é um email automático, por favor não responda.</p>
+                        <p><strong class="brand">ElloMEI</strong> - Gestão Financeira Inteligente para MEI</p>
+                        <p>© 2024 ElloMEI. Todos os direitos reservados.</p>
+                        <p style="margin-top: 16px; font-size: 13px;">Este é um email automático, por favor não responda.</p>
                     </div>
                 </div>
             </body>

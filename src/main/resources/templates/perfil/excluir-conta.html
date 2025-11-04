@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html xmlns:th="http://www.thymeleaf.org"
+      th:replace="~{layout :: layout-base(~{::title}, ~{::main})}">
+<head>
+    <title>Excluir Conta - ElloMEI</title>
+    <style>
+        :root {
+            --primary-blue: #3B82F6;
+            --primary-blue-light: #60A5FA;
+            --primary-blue-dark: #2563EB;
+            --danger-red: #EF4444;
+            --danger-red-dark: #DC2626;
+            --lavender: #E0E7FF;
+            --off-white: #FAFBFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+        }
+
+        .danger-zone {
+            background: linear-gradient(135deg, rgba(239, 68, 68, 0.05) 0%, rgba(220, 38, 38, 0.05) 100%);
+            border: 2px solid var(--danger-red);
+            border-radius: 16px;
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+
+        .warning-card {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 16px;
+            padding: 25px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--danger-red);
+            box-shadow: 0 4px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .warning-card h5 {
+            color: var(--danger-red);
+            font-weight: 700;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .warning-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .warning-list li {
+            padding: 10px 0;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            display: flex;
+            align-items: start;
+            gap: 10px;
+        }
+
+        .warning-list li:last-child {
+            border-bottom: none;
+        }
+
+        .warning-list li i {
+            color: var(--danger-red);
+            margin-top: 3px;
+            flex-shrink: 0;
+        }
+
+        .terms-box {
+            background: rgba(255, 255, 255, 0.95);
+            border: 2px solid var(--danger-red);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 25px 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .terms-box h6 {
+            color: var(--danger-red);
+            font-weight: 700;
+            margin-bottom: 15px;
+        }
+
+        .terms-box ol {
+            padding-left: 20px;
+        }
+
+        .terms-box li {
+            margin-bottom: 10px;
+            line-height: 1.6;
+        }
+
+        .checkbox-wrapper {
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            padding: 20px;
+            margin: 20px 0;
+            border: 2px solid var(--danger-red);
+        }
+
+        .checkbox-wrapper label {
+            font-weight: 600;
+            color: var(--text-dark);
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .checkbox-wrapper input[type="checkbox"] {
+            width: 24px;
+            height: 24px;
+            cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .btn-danger-custom {
+            background: linear-gradient(135deg, var(--danger-red) 0%, var(--danger-red-dark) 100%);
+            color: white;
+            border: none;
+            padding: 14px 32px;
+            border-radius: 12px;
+            font-weight: 600;
+            font-size: 16px;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 16px rgba(239, 68, 68, 0.3);
+        }
+
+        .btn-danger-custom:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(239, 68, 68, 0.4);
+        }
+
+        .btn-danger-custom:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .password-input-wrapper {
+            position: relative;
+            margin: 20px 0;
+        }
+
+        .password-input-wrapper input {
+            padding-right: 45px;
+        }
+
+        .password-toggle {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: none;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            padding: 5px;
+        }
+
+        .alert-custom {
+            border-radius: 12px;
+            padding
+: 16px;
+            border-left: 4px solid;
+            font-weight: 500;
+        }
+
+        .step-indicator {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .step {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: var(--lavender);
+            color: var(--text-muted);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            font-size: 18px;
+        }
+
+        .step.active {
+            background: linear-gradient(135deg, var(--danger-red) 0%, var(--danger-red-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(239, 68, 68, 0.3);
+        }
+
+        .step-line {
+            width: 60px;
+            height: 3px;
+            background: var(--lavender);
+        }
+
+        @media (max-width: 768px) {
+            .danger-zone {
+                padding: 20px;
+            }
+
+            .warning-card {
+                padding: 15px;
+            }
+
+            .step-indicator {
+                gap: 8px;
+            }
+
+            .step {
+                width: 32px;
+                height: 32px;
+                font-size: 14px;
+            }
+
+            .step-line {
+                width: 30px;
+            }
+        }
+    </style>
+</head>
+<body>
+<main>
+    <div class="container-fluid">
+        <!-- Cabeçalho da Página -->
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <div>
+                <h1 class="h3 mb-0 text-danger">
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Excluir Conta
+                </h1>
+                <p class="text-muted mb-0">Esta ação é permanente e não pode ser desfeita</p>
+            </div>
+            <a th:href="@{/perfil}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i>Voltar
+            </a>
+        </div>
+
+        <!-- Mensagens de Sucesso/Erro -->
+        <div th:if="${mensagemSucesso}" class="alert alert-success alert-custom alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill me-2"></i>
+            <span th:text="${mensagemSucesso}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${mensagemErro}" class="alert alert-danger alert-custom alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill me-2"></i>
+            <span th:text="${mensagemErro}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div class="row justify-content-center">
+            <div class="col-lg-8">
+                <!-- Indicador de Passos -->
+                <div class="step-indicator">
+                    <div class="step active">1</div>
+                    <div class="step-line"></div>
+                    <div class="step">2</div>
+                    <div class="step-line"></div>
+                    <div class="step">3</div>
+                </div>
+
+                <!-- Zona de Perigo -->
+                <div class="danger-zone">
+                    <div class="text-center mb-4">
+                        <i class="bi bi-exclamation-triangle-fill text-danger" style="font-size: 64px;"></i>
+                        <h2 class="mt-3 text-danger fw-bold">ATENÇÃO: Zona de Perigo</h2>
+                        <p class="text-muted">Leia atentamente todos os avisos antes de prosseguir</p>
+                    </div>
+
+                    <!-- Card: O que você vai perder -->
+                    <div class="warning-card">
+                        <h5>
+                            <i class="bi bi-database-fill-x"></i>
+                            Dados que serão PERMANENTEMENTE excluídos:
+                        </h5>
+                        <ul class="warning-list">
+                            <li>
+<i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Todos os seus lançamentos financeiros</strong> (receitas e despesas)</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Todas as suas contas bancárias</strong> cadastradas</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Todos os seus contatos</strong> (clientes e fornecedores)</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Todas as suas categorias</strong> personalizadas</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Todo o histórico de relatórios</strong> gerados</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Todos os comprovantes</strong> e documentos anexados</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Seu perfil completo</strong> e dados pessoais</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Card: Assinatura e Pagamentos -->
+                    <div class="warning-card" th:if="${usuario.plano.name() == 'PRO'}">
+                        <h5>
+                            <i class="bi bi-credit-card-fill"></i>
+                            Sobre sua assinatura PRO:
+                        </h5>
+                        <ul class="warning-list">
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>SEM REEMBOLSO:</strong> Você perderá o acesso imediato ao plano PRO sem direito a reembolso proporcional</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Dias restantes:</strong> Se você pagou pelo mês, perderá os dias restantes da assinatura</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Cancelamento automático:</strong> Sua assinatura será cancelada automaticamente sem possibilidade de recuperação</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Card: Consequências Legais e Fiscais -->
+                    <div class="warning-card">
+                        <h5>
+                            <i class="bi bi-file-earmark-text-fill"></i>
+                            Consequências legais e fiscais:
+                        </h5>
+                        <ul class="warning-list">
+                            <li>
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <span><strong>Responsabilidade fiscal:</strong> Você é responsável por manter cópias dos seus dados para fins fiscais e contábeis</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <span><strong>Declarações:</strong> Certifique-se de ter exportado todos os relatórios necessários para suas declarações (DASN-SIMEI, IRPF, etc.)</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-exclamation-triangle-fill"></i>
+                                <span><strong>Comprovantes:</strong> Faça backup de todos os comprovantes antes de excluir a conta</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Card: Não há volta -->
+                    <div class="warning-card">
+                        <h5>
+                            <i class="bi bi-shield-fill-exclamation"></i>
+                            NÃO HÁ COMO DESFAZER:
+                        </h5>
+                        <ul class="warning-list">
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Exclusão permanente:</strong> Após 30 dias, todos os dados serão PERMANENTEMENTE excluídos dos nossos servidores</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Sem recuperação:</strong> Não será possível recuperar sua conta, dados ou histórico</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Novo cadastro:</strong> Se quiser voltar, terá que criar uma nova conta do zero</span>
+                            </li>
+                            <li>
+                                <i class="bi bi-x-circle-fill"></i>
+                                <span><strong>Mesmo email:</strong> Você poderá usar o mesmo email, mas todos os dados anteriores estarão perdidos</span>
+                            </li>
+                        </ul>
+                    </div>
+
+                    <!-- Termos de Exclusão -->
+                    <div class="terms-box">
+                        <h6><i class="bi bi-file-text-fill me-2"></i>TERMOS DE EXCLUSÃO DE CONTA</h6>
+                        <ol>
+                            <li><strong>Exclusão Permanente:</strong> Ao excluir sua conta, você concorda que todos os seus dados serão permanentemente removidos após 30 dias e não poderão ser recuperados.</li>
+                            <li><strong>Sem Reembolso:</strong> Você reconhece que não terá direito a reembolso de valores pagos pela assinatura PRO, independentemente do período restante.</li>
+                            <li><strong>Responsabilidade Fiscal:</strong> Você é o único responsável por manter cópias dos seus dados financeiros para fins fiscais, contábeis e legais.</li>
+                            <li><strong>Cancelamento de Assinatura:</strong> Sua assinatura ativa será automaticamente cancelada sem possibilidade de reativação.</li>
+                            <li><strong>Perda de Acesso:</strong> Você perderá imediatamente o acesso a todos os recursos e funcionalidades da plataforma.</li>
+                            <li><strong>Dados de Terceiros:</strong> Você confirma que tem autorização para excluir todos os dados de terceiros (clientes, fornecedores) cadastrados em sua conta.</li>
+                            <li><strong>Backup Pessoal:</strong> Você declara ter feito backup de todos os dados, relatórios e comprovantes necessários antes de prosseguir.</li>
+                            <li><strong>Irreversibilidade:</strong> Você compreende que esta ação é IRREVERSÍVEL e não poderá ser desfeita após a confirmação final.</li>
+                            <li><strong>Período de Carência:</strong> Você tem 30 dias para cancelar a exclusão. Após este período, os dados serão permanentemente apagados.</li>
+                            <li><strong>Isenção de Responsabilidade:</strong> A ElloMEI não se responsabiliza por quaisquer perdas, danos ou consequências decorrentes da exclusão da sua conta.</li>
+                        </ol>
+                    </div>
+
+                    <!-- Formulário de Exclusão -->
+                    <form th:action="@{/perfil/excluir-conta}" method="post" id="formExcluirConta">
+
+                        <!-- Checkbox de Aceite dos Termos -->
+                        <div class="checkbox-wrapper">
+                            <label>
+                                <input type="checkbox" id="aceitoTermos" name="aceitoTermos" required>
+                                <span>
+                                    Li e concordo com todos os <strong>Termos de Exclusão de Conta</strong> acima.
+                                    Compreendo que esta ação é <strong>IRREVERSÍVEL</strong> e que perderei
+                                    <strong>TODOS OS MEUS DADOS PERMANENTEMENTE</strong>.
+                                </span>
+                            </label>
+                        </div>
+
+                        <!-- Confirmação por Senha -->
+                        <div class="password-input-wrapper">
+                            <label for="senha" class="form-label fw-bold">
+                                <i class="bi bi-shield-lock-fill me-2"></i>
+                                Digite sua senha para confirmar:
+                            </label>
+                            <input
+                                type="password"
+                                class="form-control form-control-lg"
+                                id="senha"
+                                name="senha"
+                                placeholder="Digite sua senha atual"
+                                required
+                                autocomplete="current-password">
+                            <button type="button" class="password-toggle" onclick="togglePassword()">
+                                <i class="bi bi-eye-fill" id="toggleIcon"></i>
+                            </button>
+                        </div>
+
+                        <!-- Botões de Ação -->
+                        <div class="d-grid gap-3 mt-4">
+                            <button
+                                type="submit"
+                                class="btn btn-danger-custom btn-lg"
+                                id="btnExcluir"
+                                disabled>
+                                <i class="bi bi-trash-fill me-2"></i>
+                                CONFIRMAR EXCLUSÃO DA CONTA
+                            </button>
+                            <a th:href="@{/perfil}" class="btn btn-outline-secondary btn-lg">
+                                <i class="bi bi-arrow-left me-2"></i>
+                                Cancelar e Voltar ao Perfil
+                            </a>
+                        </div>
+
+                        <!-- Aviso Final -->
+                        <div class="alert alert-danger mt-4 text-center">
+                            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                            <strong>ÚLTIMA CHANCE:</strong> Após clicar em "CONFIRMAR EXCLUSÃO",
+                            você receberá um email de confirmação final. Você terá 30 dias para cancelar a exclusão.
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</main>
+
+<script>
+    // Habilita o botão de exclusão apenas quando o checkbox for marcado
+    document.getElementById('aceitoTermos').addEventListener('change', function() {
+        document.getElementById('btnExcluir').disabled = !this.checked;
+    });
+
+    // Toggle de visualização de senha
+    function togglePassword() {
+        const senhaInput = document.getElementById('senha');
+        const toggleIcon = document.getElementById('toggleIcon');
+
+        if (senhaInput.type === 'password') {
+            senhaInput.type = 'text';
+            toggleIcon.classList.remove('bi-eye-fill');
+            toggleIcon.classList.add('bi-eye-slash-fill');
+        } else {
+            senhaInput.type = 'password';
+            toggleIcon.classList.remove('bi-eye-slash-fill');
+            toggleIcon.classList.add('bi-eye-fill');
+        }
+    }
+
+    // Confirmação final antes de enviar
+    document.getElementById('formExcluirConta').addEventListener('submit', function(e) {
+        e.preventDefault();
+
+        const confirmacao = confirm(
+            '⚠️ ATENÇÃO FINAL ⚠️\n\n' +
+            'Você está prestes a EXCLUIR PERMANENTEMENTE sua conta!\n\n' +
+            '✗ Todos os seus dados serão perdidos\n' +
+            '✗ Não haverá reembolso\n' +
+            '✗ Esta ação não pode ser desfeita\n\n' +
+            'Deseja realmente continuar?'
+        );
+
+        if (confirmacao) {
+            this.submit();
+        }
+    });
+</script>
+</body>
+</html>

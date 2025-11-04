@@ -1,40 +1,37 @@
 package br.com.ellomei.controller;
 
 import br.com.ellomei.config.security.CurrentUser;
+import br.com.ellomei.domain.Comprovante;
+import br.com.ellomei.domain.Lancamento;
 import br.com.ellomei.domain.StatusLancamento;
 import br.com.ellomei.domain.TipoLancamento;
 import br.com.ellomei.domain.Usuario;
-import br.com.ellomei.event.ReportGenerationRequestedEvent;
+import br.com.ellomei.service.DashboardService;
+import br.com.ellomei.service.LancamentoService;
+import br.com.ellomei.service.PdfService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationEventPublisher;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 
+import java.math.BigDecimal;
 import java.time.LocalDate;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * Controller responsável por gerenciar solicitações de relatórios.
  *
- * Este controller implementa o padrão de Eventos de Domínio para desacoplar
- * completamente a solicitação de relatórios da geração efetiva dos PDFs.
- *
- * Fluxo:
- * 1. Recebe requisição HTTP para gerar relatório
- * 2. Publica evento ReportGenerationRequestedEvent
- * 3. Retorna HTTP 202 (Accepted) imediatamente
- * 4. Listener processa o evento em background
- *
- * Benefícios:
- * - Resposta HTTP rápida (não espera geração do PDF)
- * - Escalabilidade (geração em background)
- * - Resiliência (falhas não afetam resposta HTTP)
- * - Flexibilidade (múltiplos listeners podem reagir)
+ * Gera relatórios em PDF de forma síncrona e retorna diretamente para download.
  *
  * @author ElloMEI Team
  * @since 1.0.0
@@ -43,71 +40,74 @@ import java.util.Map;
 @RequestMapping("/relatorios")
 public class RelatorioController {
 
+    private static final Logger logger = LoggerFactory.getLogger(RelatorioController.class);
+
     @Autowired
-    private ApplicationEventPublisher eventPublisher;
+    private PdfService pdfService;
+
+    @Autowired
+    private LancamentoService lancamentoService;
+
+    @Autowired
+    private DashboardService dashboardService;
 
 
     /**
-     * Solicita geração de relatório de faturamento dinâmico.
+     * Gera relatório de faturamento MEI em PDF e retorna para download.
      *
-     * Este endpoint publica um evento e retorna imediatamente com HTTP 202 (Accepted).
-     * O PDF será gerado em background e o usuário será notificado quando estiver pronto.
-     *
-     * @return ResponseEntity com status 202 e mensagem informativa
+     * @return ResponseEntity com o PDF para download
      */
-    @GetMapping("/faturamento/dinamico/pdf")
-    public ResponseEntity<Map<String, String>> gerarRelatorioFaturamentoDinamico(
-            @RequestParam String tipoVisao,
-            @RequestParam(required = false) LocalDate dataInicio,
-            @RequestParam(required = false) LocalDate dataFim,
-            @RequestParam(required = false) Long contaId,
-            @RequestParam(required = false) Long contatoId,
-            @RequestParam(required = false) TipoLancamento tipo,
-            @RequestParam(required = false) Long categoriaId,
-            @RequestParam(required = false) Boolean comNotaFiscal,
-            @RequestParam(required = false) String descricao,
-            @RequestParam(required = false) StatusLancamento status,
+    @GetMapping("/faturamento/mei/pdf")
+    public ResponseEntity<byte[]> gerarRelatorioFaturamentoMEI(
+            @RequestParam(required = false) Integer ano,
             @CurrentUser Usuario usuario) {
 
-        // Publica evento para geração assíncrona do relatório
-        ReportGenerationRequestedEvent event = ReportGenerationRequestedEvent.builder()
-                .source(this)
-                .tipoRelatorio("FATURAMENTO_DINAMICO")
-                .tipoVisao(tipoVisao)
-                .dataInicio(dataInicio)
-                .dataFim(dataFim)
-                .contaId(contaId)
-                .contatoId(contatoId)
-                .tipo(tipo)
-                .categoriaId(categoriaId)
-                .comNotaFiscal(comNotaFiscal)
-                .descricao(descricao)
-                .status(status)
-                .usuario(usuario)
-                .build();
+        try {
+            if (ano == null) {
+                ano = LocalDate.now().getYear();
+            }
 
-        eventPublisher.publishEvent(event);
+            logger.info("Gerando relatório de faturamento MEI para ano {} e usuário: {}", ano, usuario.getUsername());
 
-        // Retorna resposta imediata
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Seu relatório está sendo processado. Você será notificado quando estiver pronto.");
-        response.put("status", "PROCESSING");
-        response.put("tipoRelatorio", "FATURAMENTO_DINAMICO");
-        response.put("tipoVisao", tipoVisao);
+            // Buscar faturamento oficial e bancário
+            BigDecimal faturamentoOficial = dashboardService.getFaturamentoOficial(ano, usuario);
+            BigDecimal faturamentoBancario = dashboardService.getFaturamentoBancario(ano, usuario);
+            BigDecimal metaFaturamento = dashboardService.getMetaFaturamentoBaseadoEmCustos(ano, usuario);
 
-        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+            // Preparar variáveis para o template
+            Map<String, Object> variaveis = new HashMap<>();
+            variaveis.put("ano", ano);
+            variaveis.put("faturamentoOficial", faturamentoOficial);
+            variaveis.put("faturamentoBancario", faturamentoBancario);
+            variaveis.put("metaFaturamento", metaFaturamento);
+
+            // Gerar PDF
+            CompletableFuture<byte[]> pdfFuture = pdfService.gerarPdfDeHtml("relatorio_faturamento_mei", variaveis);
+            byte[] pdfBytes = pdfFuture.get();
+
+            logger.info("PDF gerado com sucesso. Tamanho: {} KB", pdfBytes.length / 1024);
+
+            // Configurar headers para download
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "relatorio_faturamento_mei_" + ano + ".pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            logger.error("Erro ao gerar relatório de faturamento MEI", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
-     * Solicita geração de relatório de compras com nota fiscal.
+     * Gera relatório de compras com nota fiscal em PDF e retorna para download.
      *
-     * Este endpoint publica um evento e retorna imediatamente com HTTP 202 (Accepted).
-     * O PDF será gerado em background e o usuário será notificado quando estiver pronto.
-     *
-     * @return ResponseEntity com status 202 e mensagem informativa
+     * @return ResponseEntity com o PDF para download
      */
     @GetMapping("/compras-com-nota/pdf")
-    public ResponseEntity<Map<String, String>> gerarRelatorioComprasNota(
+    public ResponseEntity<byte[]> gerarRelatorioComprasNota(
             @RequestParam(required = false) LocalDate dataInicio,
             @RequestParam(required = false) LocalDate dataFim,
             @RequestParam(required = false) Long contaId,
@@ -117,41 +117,57 @@ public class RelatorioController {
             @RequestParam(required = false) StatusLancamento status,
             @CurrentUser Usuario usuario) {
 
-        // Publica evento para geração assíncrona do relatório
-        ReportGenerationRequestedEvent event = ReportGenerationRequestedEvent.builder()
-                .source(this)
-                .tipoRelatorio("COMPRAS_COM_NOTA")
-                .dataInicio(dataInicio)
-                .dataFim(dataFim)
-                .contaId(contaId)
-                .contatoId(contatoId)
-                .categoriaId(categoriaId)
-                .descricao(descricao)
-                .status(status)
-                .usuario(usuario)
-                .build();
+        try {
+            logger.info("Gerando relatório de compras com nota para usuário: {}", usuario.getUsername());
 
-        eventPublisher.publishEvent(event);
+            // Buscar lançamentos de SAÍDA com nota fiscal
+            List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(
+                    dataInicio, dataFim, contaId, contatoId, TipoLancamento.SAIDA, categoriaId,
+                    true, // comNotaFiscal = true
+                    descricao, status, usuario
+            );
 
-        // Retorna resposta imediata
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Seu relatório está sendo processado. Você será notificado quando estiver pronto.");
-        response.put("status", "PROCESSING");
-        response.put("tipoRelatorio", "COMPRAS_COM_NOTA");
+            logger.info("Encontrados {} lançamentos com nota fiscal", lancamentos.size());
 
-        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+            // Calcular total
+            BigDecimal total = lancamentos.stream()
+                    .map(Lancamento::getValor)
+                    .reduce(BigDecimal.ZERO, BigDecimal::add);
+
+            // Preparar variáveis para o template
+            Map<String, Object> variaveis = new HashMap<>();
+            variaveis.put("lancamentos", lancamentos);
+            variaveis.put("total", total);
+            variaveis.put("dataInicio", dataInicio);
+            variaveis.put("dataFim", dataFim);
+
+            // Gerar PDF
+            CompletableFuture<byte[]> pdfFuture = pdfService.gerarPdfDeHtml("relatorio_compras_com_nota", variaveis);
+            byte[] pdfBytes = pdfFuture.get();
+
+            logger.info("PDF gerado com sucesso. Tamanho: {} KB", pdfBytes.length / 1024);
+
+            // Configurar headers para download
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "relatorio_compras_com_nota.pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            logger.error("Erro ao gerar relatório de compras com nota", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     /**
-     * Solicita geração de relatório de lançamentos.
+     * Gera relatório de lançamentos em PDF e retorna para download.
      *
-     * Este endpoint publica um evento e retorna imediatamente com HTTP 202 (Accepted).
-     * O PDF será gerado em background e o usuário será notificado quando estiver pronto.
-     *
-     * @return ResponseEntity com status 202 e mensagem informativa
+     * @return ResponseEntity com o PDF para download
      */
     @GetMapping("/lancamentos/pdf")
-    public ResponseEntity<Map<String, String>> gerarRelatorioLancamentos(
+    public ResponseEntity<byte[]> gerarRelatorioLancamentos(
             @RequestParam(required = false) LocalDate dataInicio,
             @RequestParam(required = false) LocalDate dataFim,
             @RequestParam(required = false) Long contaId,
@@ -163,30 +179,50 @@ public class RelatorioController {
             @RequestParam(required = false) StatusLancamento status,
             @CurrentUser Usuario usuario) {
 
-        // Publica evento para geração assíncrona do relatório
-        ReportGenerationRequestedEvent event = ReportGenerationRequestedEvent.builder()
-                .source(this)
-                .tipoRelatorio("LANCAMENTOS")
-                .dataInicio(dataInicio)
-                .dataFim(dataFim)
-                .contaId(contaId)
-                .contatoId(contatoId)
-                .tipo(tipo)
-                .categoriaId(categoriaId)
-                .comNotaFiscal(comNotaFiscal)
-                .descricao(descricao)
-                .status(status)
-                .usuario(usuario)
-                .build();
+        try {
+            logger.info("Gerando relatório de lançamentos para usuário: {}", usuario.getUsername());
 
-        eventPublisher.publishEvent(event);
+            // Buscar lançamentos com os filtros
+            List<Lancamento> lancamentos = lancamentoService.buscarComFiltros(
+                    dataInicio, dataFim, contaId, contatoId, tipo, categoriaId,
+                    comNotaFiscal, descricao, status, usuario
+            );
 
-        // Retorna resposta imediata
-        Map<String, String> response = new HashMap<>();
-        response.put("message", "Seu relatório está sendo processado. Você será notificado quando estiver pronto.");
-        response.put("status", "PROCESSING");
-        response.put("tipoRelatorio", "LANCAMENTOS");
+            logger.info("Encontrados {} lançamentos", lancamentos.size());
 
-        return new ResponseEntity<>(response, HttpStatus.ACCEPTED);
+            // Processar caminhos dos comprovantes para serem acessíveis no PDF
+            for (Lancamento lancamento : lancamentos) {
+                for (Comprovante comprovante : lancamento.getComprovantes()) {
+                    String currentPath = comprovante.getPathArquivo();
+                    if (currentPath != null && !currentPath.startsWith("/uploads/")) {
+                        comprovante.setPathArquivo("/uploads/" + currentPath);
+                    }
+                }
+            }
+
+            // Preparar variáveis para o template
+            Map<String, Object> variaveis = new HashMap<>();
+            variaveis.put("lancamentos", lancamentos);
+            variaveis.put("dataInicio", dataInicio);
+            variaveis.put("dataFim", dataFim);
+
+            // Gerar PDF
+            CompletableFuture<byte[]> pdfFuture = pdfService.gerarPdfDeHtml("relatorio_lancamentos", variaveis);
+            byte[] pdfBytes = pdfFuture.get();
+
+            logger.info("PDF gerado com sucesso. Tamanho: {} KB", pdfBytes.length / 1024);
+
+            // Configurar headers para download
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_PDF);
+            headers.setContentDispositionFormData("attachment", "relatorio_lancamentos.pdf");
+            headers.setContentLength(pdfBytes.length);
+
+            return new ResponseEntity<>(pdfBytes, headers, HttpStatus.OK);
+
+        } catch (Exception e) {
+            logger.error("Erro ao gerar relatório de lançamentos", e);
+            return new ResponseEntity<>(HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 }

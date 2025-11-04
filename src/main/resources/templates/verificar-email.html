@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="pt-BR" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Verificar Email - ElloMEI</title>
+
+    <!-- Google Fonts - Inter -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+
+    <!-- Bootstrap 5.3 -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <style>
+        :root {
+            --primary-blue: #3B82F6;
+            --primary-blue-light: #60A5FA;
+            --primary-blue-dark: #2563EB;
+            --lavender: #E0E7FF;
+            --lavender-light: #F0F4FF;
+            --white: #FFFFFF;
+            --off-white: #FAFBFF;
+            --text-dark: #1E293B;
+            --text-muted: #64748B;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            min-height: 100vh;
+            background: var(--off-white);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        /* Animated Background Gradients */
+        .gradient-bg {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            z-index: -1;
+            overflow: hidden;
+        }
+
+        .gradient-circle {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(80px);
+            opacity: 0.6;
+            animation: float 20s infinite ease-in-out;
+        }
+
+        .gradient-circle-1 {
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--lavender));
+            top: -10%;
+            left: -10%;
+            animation-delay: 0s;
+        }
+
+        .gradient-circle-2 {
+            width: 400px;
+            height: 400px;
+            background: linear-gradient(135deg, var(--lavender), var(--primary-blue-light));
+            bottom: -10%;
+            right: -10%;
+            animation-delay: 5s;
+        }
+
+        .gradient-circle-3 {
+            width: 300px;
+            height: 300px;
+            background: linear-gradient(135deg, var(--primary-blue-light), var(--lavender-light));
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            animation-delay: 10s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translate(0, 0) scale(1);
+            }
+            33% {
+                transform: translate(30px, -30px) scale(1.1);
+            }
+            66% {
+                transform: translate(-20px, 20px) scale(0.9);
+            }
+        }
+
+        /* Glassmorphism Container */
+        .verification-container {
+            background: rgba(255, 255, 255, 0.25);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border-radius: 24px;
+            padding: 50px 40px;
+            max-width: 550px;
+            width: 100%;
+            animation: slideIn 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+            position: relative;
+            z-index: 1;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-40px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .verification-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .verification-icon {
+            width: 90px;
+            height: 90px;
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 24px;
+            animation: pulse 2s infinite;
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+        }
+
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 8px 24px rgba(59, 130, 246, 0.4);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 12px 32px rgba(59, 130, 246, 0.6);
+            }
+        }
+
+        .verification-icon i {
+            font-size: 44px;
+            color: white;
+        }
+
+        .verification-header h1 {
+            color: var(--text-dark);
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .verification-header p {
+            color: var(--text-muted);
+            font-size: 16px;
+            font-weight: 500;
+            line-height: 1.6;
+        }
+
+        .code-input-group {
+            display: flex;
+            justify-content: center;
+            gap: 12px;
+            margin: 40px 0;
+        }
+
+        .code-input {
+            width: 56px;
+            height: 68px;
+            text-align: center;
+            font-size: 28px;
+            font-weight: 700;
+            border: 2px solid rgba(59, 130, 246, 0.3);
+            border-radius: 16px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            background: rgba(255, 255, 255, 0.8);
+            color: var(--text-dark);
+        }
+
+        .code-input:focus {
+            border-color: var(--primary-blue);
+            box-shadow: 0 0 0 4px rgba(59, 130, 246, 0.15);
+            outline: none;
+            transform: scale(1.05);
+            background: white;
+        }
+
+        .btn-verify {
+            background: linear-gradient(135deg, var(--primary-blue), var(--primary-blue-dark));
+            border: none;
+            color: white;
+            padding: 18px;
+            border-radius: 16px;
+            font-size: 18px;
+            font-weight: 700;
+            width: 100%;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin-top: 24px;
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+            letter-spacing: 0.3px;
+        }
+
+        .btn-verify:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 24px rgba(59, 130, 246, 0.5);
+        }
+
+        .btn-verify:active {
+            transform: translateY(-1px);
+        }
+
+        .resend-section {
+            text-align: center;
+            margin-top: 32px;
+            padding-top: 32px;
+            border-top: 2px solid rgba(59, 130, 246, 0.1);
+        }
+
+        .resend-section p {
+            color: var(--text-muted);
+            margin-bottom: 16px;
+            font-weight: 500;
+        }
+
+        .btn-resend {
+            background: transparent;
+            border: 2px solid var(--primary-blue);
+            color: var(--primary-blue);
+            padding: 12px 32px;
+            border-radius: 16px;
+            font-weight: 700;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            letter-spacing: 0.3px;
+        }
+
+        .btn-resend:hover {
+            background: var(--primary-blue);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 16px rgba(59, 130, 246, 0.3);
+        }
+
+        .alert {
+            border-radius: 16px;
+            margin-bottom: 24px;
+            border: none;
+            font-weight: 500;
+            padding: 16px 20px;
+        }
+
+        .alert-success {
+            background: rgba(34, 197, 94, 0.1);
+            color: #15803d;
+            border-left: 4px solid #22c55e;
+        }
+
+        .alert-danger {
+            background: rgba(239, 68, 68, 0.1);
+            color: #991b1b;
+            border-left: 4px solid #ef4444;
+        }
+
+        .info-box {
+            background: rgba(59, 130, 246, 0.05);
+            border-left: 4px solid var(--primary-blue);
+            padding: 18px;
+            border-radius: 12px;
+            margin-top: 24px;
+        }
+
+        .info-box i {
+            color: var(--primary-blue);
+            margin-right: 12px;
+            font-size: 18px;
+        }
+
+        .back-to-login {
+            text-align: center;
+            margin-top: 24px;
+        }
+
+        .back-to-login a {
+            color: var(--primary-blue);
+            text-decoration: none;
+            font-weight: 700;
+            transition: all 0.3s;
+            letter-spacing: 0.3px;
+        }
+
+        .back-to-login a:hover {
+            color: var(--primary-blue-dark);
+            text-decoration: underline;
+        }
+
+        @media (max-width: 576px) {
+            .verification-container {
+                padding: 40px 24px;
+            }
+
+            .verification-header h1 {
+                font-size: 28px;
+            }
+
+            .code-input {
+                width: 48px;
+                height: 60px;
+                font-size: 24px;
+            }
+
+            .code-input-group {
+                gap: 8px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Animated Background -->
+    <div class="gradient-bg">
+        <div class="gradient-circle gradient-circle-1"></div>
+        <div class="gradient-circle gradient-circle-2"></div>
+        <div class="gradient-circle gradient-circle-3"></div>
+    </div>
+
+    <div class="verification-container">
+        <div class="verification-header">
+            <div class="verification-icon">
+                <i class="bi bi-envelope-check-fill"></i>
+            </div>
+            <h1>Verificar Email</h1>
+            <p>Digite o código de 6 dígitos enviado para seu email</p>
+        </div>
+
+        <!-- Mensagens de Sucesso/Erro -->
+        <div th:if="${mensagemSucesso}" class="alert alert-success alert-dismissible fade show" role="alert">
+            <i class="bi bi-check-circle-fill"></i>
+            <span th:text="${mensagemSucesso}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <div th:if="${mensagemErro}" class="alert alert-danger alert-dismissible fade show" role="alert">
+            <i class="bi bi-exclamation-circle-fill"></i>
+            <span th:text="${mensagemErro}"></span>
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        </div>
+
+        <!-- Formulário de Verificação -->
+        <form th:action="@{/verificar-email}" method="post" id="verificationForm">
+            <div class="code-input-group">
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+                <input type="text" class="code-input" maxlength="1" pattern="[0-9]" required>
+            </div>
+
+            <!-- Campo oculto que armazena o código completo -->
+            <input type="hidden" name="codigo" id="codigoCompleto">
+
+            <button type="submit" class="btn btn-verify">
+                <i class="bi bi-check-circle-fill"></i> Verificar Código
+            </button>
+        </form>
+
+        <!-- Informações -->
+        <div class="info-box">
+            <i class="bi bi-info-circle-fill"></i>
+            <strong>Dica:</strong> O código expira em 15 minutos. Verifique sua caixa de spam se não recebeu o email.
+        </div>
+
+        <!-- Reenviar Código -->
+        <div class="resend-section">
+            <p>Não recebeu o código?</p>
+            <form th:action="@{/verificar-email/reenviar}" method="post" style="display: inline;">
+                <input type="hidden" name="email" th:value="${emailCadastrado}">
+                <button type="submit" class="btn btn-resend">
+                    <i class="bi bi-arrow-clockwise"></i> Reenviar Código
+                </button>
+            </form>
+        </div>
+
+        <!-- Voltar para Login -->
+        <div class="back-to-login">
+            <a th:href="@{/login}">
+                <i class="bi bi-arrow-left"></i> Voltar para o Login
+            </a>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Script para navegação automática entre os campos de código
+        const inputs = document.querySelectorAll('.code-input');
+        const codigoCompleto = document.getElementById('codigoCompleto');
+        const form = document.getElementById('verificationForm');
+
+        inputs.forEach((input, index) => {
+            // Foca no primeiro campo ao carregar
+            if (index === 0) {
+                input.focus();
+            }
+
+            // Navega para o próximo campo ao digitar
+            input.addEventListener('input', (e) => {
+                if (e.target.value.length === 1 && index < inputs.length - 1) {
+                    inputs[index + 1].focus();
+                }
+                atualizarCodigoCompleto();
+            });
+
+            // Navega para o campo anterior ao pressionar Backspace
+            input.addEventListener('keydown', (e) => {
+                if (e.key === 'Backspace' && e.target.value === '' && index > 0) {
+                    inputs[index - 1].focus();
+                }
+            });
+
+            // Permite apenas números
+            input.addEventListener('keypress', (e) => {
+                if (!/[0-9]/.test(e.key)) {
+                    e.preventDefault();
+                }
+            });
+
+            // Cola código completo se disponível
+            input.addEventListener('paste', (e) => {
+                e.preventDefault();
+                const pastedData = e.clipboardData.getData('text').replace(/\D/g, '');
+                if (pastedData.length === 6) {
+                    inputs.forEach((inp, i) => {
+                        inp.value = pastedData[i] || '';
+                    });
+                    inputs[5].focus();
+                    atualizarCodigoCompleto();
+                }
+            });
+        });
+
+        // Atualiza o campo oculto com o código completo
+        function atualizarCodigoCompleto() {
+            const codigo = Array.from(inputs).map(input => input.value).join('');
+            codigoCompleto.value = codigo;
+        }
+
+        // Valida antes de enviar
+        form.addEventListener('submit', (e) => {
+            atualizarCodigoCompleto();
+            if (codigoCompleto.value.length !== 6) {
+                e.preventDefault();
+                alert('Por favor, digite o código completo de 6 dígitos.');
+                inputs[0].focus();
+            }
+        });
+    </script>
+</body>
+</html>
+

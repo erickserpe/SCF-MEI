@@ -79,11 +79,12 @@ public class RegistroController {
 
             logger.info("✅ Usuário {} registrado com sucesso!", usuario.getUsername());
 
-            // Redireciona para o login com mensagem de sucesso
+            // Redireciona para a página de verificação de email
             redirectAttributes.addFlashAttribute("mensagemSucesso",
-                "🎉 Cadastro realizado com sucesso! Verifique seu email para confirmar o cadastro e faça login.");
+                "🎉 Cadastro realizado com sucesso! Verifique seu email e insira o código de verificação.");
+            redirectAttributes.addFlashAttribute("emailCadastrado", usuario.getEmail());
 
-            return "redirect:/login";
+            return "redirect:/verificar-email";
 
         } catch (UsuarioDuplicadoException e) {
             // Erro de duplicidade (username ou email já existe)

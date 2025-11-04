@@ -42,6 +42,9 @@ public class UsuarioService {
     @Autowired
     private ApplicationEventPublisher eventPublisher; // Publicador de eventos de domínio
 
+    @Autowired
+    private EmailVerificationService emailVerificationService; // Serviço de verificação de email
+
     /**
      * Salva um novo usuário no sistema.
      *
@@ -81,6 +84,15 @@ public class UsuarioService {
         // Salva o usuário no banco de dados
         Usuario novoUsuario = usuarioRepository.save(usuario);
         logger.info("✅ Usuário {} cadastrado com sucesso! ID: {}", novoUsuario.getUsername(), novoUsuario.getId());
+
+        // Cria e envia código de verificação de email
+        try {
+            emailVerificationService.criarEEnviarCodigo(novoUsuario);
+            logger.info("📧 Código de verificação enviado para: {}", novoUsuario.getEmail());
+        } catch (Exception e) {
+            logger.error("❌ Erro ao enviar código de verificação: {}", e.getMessage());
+            // Não bloqueia o registro se o email falhar
+        }
 
         // Publica o evento após salvar
         // Isso permite que outros componentes (listeners) reajam ao registro

@@ -14,7 +14,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 /**
  * Controller responsável pelo gerenciamento do perfil do usuário.
- * 
+ *
  * Permite visualizar e editar dados pessoais, gerenciar assinatura
  * e configurações da conta.
  */
@@ -30,9 +30,9 @@ public class ProfileController {
 
     /**
      * Exibe a página de perfil do usuário.
-     * 
+     *
      * Mostra dados pessoais, informações da assinatura ativa e opções de configuração.
-     * 
+     *
      * @param usuario Usuário autenticado (injetado via @CurrentUser)
      * @param model Modelo para passar dados para a view
      * @return Nome do template Thymeleaf
@@ -51,7 +51,7 @@ public class ProfileController {
 
     /**
      * Exibe o formulário de edição de dados pessoais.
-     * 
+     *
      * @param usuario Usuário autenticado
      * @param model Modelo para passar dados para a view
      * @return Nome do template Thymeleaf
@@ -65,10 +65,10 @@ public class ProfileController {
 
     /**
      * Processa a atualização dos dados pessoais do usuário.
-     * 
+     *
      * Este método garante que apenas campos permitidos sejam atualizados,
      * evitando alterações maliciosas em campos sensíveis (id, password, roles, plano).
-     * 
+     *
      * @param usuarioForm Dados do formulário
      * @param result Resultado da validação
      * @param usuarioLogado Usuário autenticado (do SecurityContext)
@@ -101,7 +101,7 @@ public class ProfileController {
 
     /**
      * Exibe o formulário de alteração de senha.
-     * 
+     *
      * @param model Modelo para passar dados para a view
      * @return Nome do template Thymeleaf
      */
@@ -113,7 +113,7 @@ public class ProfileController {
 
     /**
      * Processa a alteração de senha do usuário.
-     * 
+     *
      * @param senhaAtual Senha atual para validação
      * @param novaSenha Nova senha a ser definida
      * @param confirmacaoSenha Confirmação da nova senha
@@ -129,19 +129,16 @@ public class ProfileController {
             @CurrentUser Usuario usuarioLogado,
             RedirectAttributes attributes) {
 
-        // Valida se as senhas coincidem
         if (!novaSenha.equals(confirmacaoSenha)) {
             attributes.addFlashAttribute("mensagemErro", "A nova senha e a confirmação não coincidem.");
             return "redirect:/perfil/alterar-senha";
         }
 
-        // Valida tamanho mínimo da senha
         if (novaSenha.length() < 6) {
             attributes.addFlashAttribute("mensagemErro", "A nova senha deve ter no mínimo 6 caracteres.");
             return "redirect:/perfil/alterar-senha";
         }
 
-        // Tenta atualizar a senha
         boolean sucesso = profileService.atualizarSenha(usuarioLogado, senhaAtual, novaSenha);
 
         if (sucesso) {
@@ -150,6 +147,51 @@ public class ProfileController {
         } else {
             attributes.addFlashAttribute("mensagemErro", "Senha atual incorreta.");
             return "redirect:/perfil/alterar-senha";
+        }
+    }
+
+    /**
+     * Exibe a página de exclusão de conta com todos os avisos.
+     */
+    @GetMapping("/excluir-conta")
+    public String deleteAccountForm(@CurrentUser Usuario usuario, Model model) {
+        model.addAttribute("usuario", usuario);
+        model.addAttribute("paginaAtual", "perfil");
+        return "perfil/excluir-conta";
+    }
+
+    /**
+     * Processa a exclusão da conta do usuário.
+     */
+    @PostMapping("/excluir-conta")
+    public String deleteAccount(
+            @RequestParam("senha") String senha,
+            @RequestParam(value = "aceitoTermos", required = false) String aceitoTermos,
+            @CurrentUser Usuario usuarioLogado,
+            RedirectAttributes attributes) {
+
+        // Valida se o usuário aceitou os termos
+        if (aceitoTermos == null || !aceitoTermos.equals("on")) {
+            attributes.addFlashAttribute("mensagemErro", "Você precisa aceitar os termos de exclusão.");
+            return "redirect:/perfil/excluir-conta";
+        }
+
+        // Valida a senha
+        boolean senhaCorreta = profileService.validarSenha(usuarioLogado, senha);
+        if (!senhaCorreta) {
+            attributes.addFlashAttribute("mensagemErro", "Senha incorreta. Tente novamente.");
+            return "redirect:/perfil/excluir-conta";
+        }
+
+        try {
+            // Exclui a conta do usuário
+            profileService.excluirConta(usuarioLogado);
+
+            // Faz logout
+            return "redirect:/logout?contaExcluida=true";
+        } catch (Exception e) {
+            attributes.addFlashAttribute("mensagemErro", "Erro ao excluir conta: " + e.getMessage());
+            return "redirect:/perfil/excluir-conta";
         }
     }
 }

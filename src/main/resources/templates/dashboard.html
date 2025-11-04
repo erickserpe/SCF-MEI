@@ -726,24 +726,19 @@
 
             // Report Generation Functions
             window.gerarRelatorioFaturamentoMEI = function() {
-                const tipoVisao = document.getElementById('tipo-relatorio-mei').value;
-                const dataInicio = document.getElementById('dataInicio').value;
-                const dataFim = document.getElementById('dataFim').value;
-
-                let reportUrl = `/relatorios/faturamento/dinamico/pdf?tipoVisao=${tipoVisao}`;
-                if (dataInicio) reportUrl += `&dataInicio=${dataInicio}`;
-                if (dataFim) reportUrl += `&dataFim=${dataFim}`;
-
+                // Pega o ano atual ou permite que o usuário escolha
+                const anoAtual = new Date().getFullYear();
+                const reportUrl = `/relatorios/faturamento/mei/pdf?ano=${anoAtual}`;
                 window.open(reportUrl, '_blank');
             };
 
             window.gerarRelatorioAnaliseGeral = function() {
+                // Relatório geral usa o mesmo endpoint de lançamentos
                 const form = document.getElementById('global-filter-form');
                 const formData = new FormData(form);
                 const params = new URLSearchParams(formData);
-                params.append('tipoVisao', 'ANALISE_GERAL');
 
-                const reportUrl = `/relatorios/faturamento/dinamico/pdf?${params.toString()}`;
+                const reportUrl = `/relatorios/lancamentos/pdf?${params.toString()}`;
                 window.open(reportUrl, '_blank');
             };
 

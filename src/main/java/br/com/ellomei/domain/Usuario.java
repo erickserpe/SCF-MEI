@@ -74,6 +74,10 @@ public class Usuario {
     @NotNull
     private PlanoAssinatura plano = PlanoAssinatura.FREE;
 
+    // Verificação de Email
+    @Column(nullable = false)
+    private boolean emailVerificado = false;
+
     // --- CORREÇÃO: A RELAÇÃO INCORRETA FOI REMOVIDA DAQUI ---
 
     // Getters e Setters...
@@ -108,5 +112,11 @@ public class Usuario {
     }
     public void setPlano(PlanoAssinatura plano) {
         this.plano = plano;
+    }
+    public boolean isEmailVerificado() {
+        return emailVerificado;
+    }
+    public void setEmailVerificado(boolean emailVerificado) {
+        this.emailVerificado = emailVerificado;
     }
 }
