@@ -48,8 +48,10 @@ RUN apk add --no-cache curl
 RUN addgroup -S spring && adduser -S spring -G spring
 
 # Create directories with proper permissions
-RUN mkdir -p /app/uploads /var/log/scf-mei && \
-    chown -R spring:spring /app /var/log/scf-mei
+# /app/uploads: Para arquivos de upload (comprovantes, etc)
+# /var/log/ellomei: Para logs da aplicacao em producao
+RUN mkdir -p /app/uploads /var/log/ellomei && \
+    chown -R spring:spring /app /var/log/ellomei
 
 # Copy the built JAR from build stage
 COPY --from=build /app/target/*.jar app.jar
